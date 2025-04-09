@@ -84,27 +84,26 @@ def clean_installs(installs_str: str) -> int:
 
 def assign_price_tier(price):
     """
-    Assigns a price tier label based on the numeric price of an app.
+    Assigns an ordinal price tier (1–5) based on app price.
 
     Args:
-        price (float or int): The cleaned price of the app.
+        price (float or int): The cleaned numeric price.
 
     Returns:
-        str: A categorical label representing the price tier.
-             One of ["free", "cheap", "mid", "premium", "expensive", "unknown"].
+        int: Ordinal price tier. 1 = free, 5 = most expensive.
     """
     if pd.isna(price):
-        return "unknown"
+        return 1  # Default unknown/missing as free
     elif price == 0:
-        return "free"
+        return 1
     elif price <= 2:
-        return "cheap"
+        return 2
     elif price <= 10:
-        return "mid"
+        return 3
     elif price <= 30:
-        return "premium"
+        return 4
     else:
-        return "expensive"
+        return 5
 
 
 def clean_googleplay_data(
@@ -156,6 +155,10 @@ def clean_googleplay_data(
     df["price_clean"] = df["price"].replace({r"\$": "", ",": ""}, regex=True)
     df["price_clean"] = pd.to_numeric(df["price_clean"], errors="coerce")
 
+    # Derive price tier from price_clean
+    df["price_tier"] = df["price_clean"].apply(assign_price_tier)
+
+
     logging.info("Converting 'last_updated' column to datetime...")
     try:
         df["last_updated_date"] = pd.to_datetime(
@@ -186,6 +189,7 @@ def clean_googleplay_data(
             "installs_clean",
             "type",
             "price_clean",
+            "price_tier",
             "content_rating",
             "genres",
             "last_updated_date",

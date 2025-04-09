@@ -109,6 +109,8 @@ def process_app(app: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             update_freq_days = (datetime.now() - datetime.fromtimestamp(last_updated / 1000)).days
         else:
             update_freq_days = None
+        
+        price_tier = 1  # Free by default
 
         # Process localized fields with fallback
         localized = app.get("localized", {})
@@ -131,6 +133,7 @@ def process_app(app: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "app_name": app_name,
             "summary": summary,
             "description": description,
+            "price_tier": price_tier,
         }
         return processed_app
     except Exception as e:
