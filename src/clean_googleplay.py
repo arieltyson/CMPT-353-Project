@@ -82,6 +82,30 @@ def clean_installs(installs_str: str) -> int:
         logging.warning(f"Error converting Installs '{installs_str}': {e}")
         return None
 
+def assign_price_tier(price):
+    """
+    Assigns a price tier label based on the numeric price of an app.
+
+    Args:
+        price (float or int): The cleaned price of the app.
+
+    Returns:
+        str: A categorical label representing the price tier.
+             One of ["free", "cheap", "mid", "premium", "expensive", "unknown"].
+    """
+    if pd.isna(price):
+        return "unknown"
+    elif price == 0:
+        return "free"
+    elif price <= 2:
+        return "cheap"
+    elif price <= 10:
+        return "mid"
+    elif price <= 30:
+        return "premium"
+    else:
+        return "expensive"
+
 
 def clean_googleplay_data(
     input_file: str = "data/uncleaned/googleplaystore.csv",
