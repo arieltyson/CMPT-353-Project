@@ -140,6 +140,12 @@ def clean_googleplay_data(
     except Exception as e:
         logging.error(f"Error parsing 'last_updated' dates: {e}")
 
+    # Compute days since last update
+    df["update_freq_days"] = (pd.Timestamp("today") - df["last_updated_date"]).dt.days
+
+    # Assume Google Play apps do not report anti-features; default to 0
+    df["anti_feature_score"] = 0
+
     initial_len = len(df)
     # Drop rows with missing critical data: app_name, rating, installs_clean
     df.dropna(subset=["app_name", "rating", "installs_clean"], inplace=True)
@@ -161,6 +167,8 @@ def clean_googleplay_data(
             "last_updated_date",
             "current_ver",
             "android_ver",
+            "update_freq_days",
+            "anti_feature_score",
         ]
     ].copy()
 
